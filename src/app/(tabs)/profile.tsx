@@ -6,12 +6,14 @@ import { Button, Card, Row, SectionTitle } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { API_BASE_URL } from '@/lib/config';
 import { formatDate, formatPeso } from '@/lib/format';
+import { usePrinterSettings } from '@/lib/printer';
 import { useCashOnHand, useProfile } from '@/lib/queries';
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
   const profile = useProfile();
   const cash = useCashOnHand();
+  const printer = usePrinterSettings();
 
   const confirmSignOut = () => {
     const cashAmount = cash.data?.amount ?? 0;
@@ -44,6 +46,14 @@ export default function ProfileScreen() {
         <Row label="Counting from" value={cash.data?.since ? formatDate(cash.data.since) : 'All time'} />
       </Card>
       <Button title="View remittances" variant="secondary" onPress={() => router.push('/remittances')} style={styles.gap} />
+
+      <SectionTitle>Receipt printer</SectionTitle>
+      <Card>
+        <Row label="Printer" value={printer.data?.printer?.name ?? 'Not set up'} />
+        <Row label="Paper" value={printer.data ? `${printer.data.paperWidth} mm` : '—'} />
+        <Row label="Auto-print" value={printer.data?.autoPrint ? 'On' : 'Off'} />
+      </Card>
+      <Button title="Printer settings" variant="secondary" onPress={() => router.push('/printer')} style={styles.gap} />
 
       <SectionTitle>App</SectionTitle>
       <Card>

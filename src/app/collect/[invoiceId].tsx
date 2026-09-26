@@ -75,6 +75,8 @@ export default function CollectScreen() {
         pathname: '/receipt/[paymentId]',
         params: {
           paymentId: result.payment.id,
+          // A duplicate means the receipt may already have been printed.
+          justPaid: result.status === 'duplicate' ? '' : '1',
           notice:
             result.status === 'duplicate'
               ? 'This payment was already recorded earlier — no double posting.'

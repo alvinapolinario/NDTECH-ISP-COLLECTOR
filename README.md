@@ -81,12 +81,39 @@ src/
     types.ts            API response types
 ```
 
+## Bluetooth receipt printer (ESC/POS)
+
+Collectors can print a payment acknowledgement on a Bluetooth thermal printer
+(58 mm or 80 mm, ESC/POS, Bluetooth Classic / SPP — e.g. PT-210, Goojprt,
+Xprinter, Zjiang).
+
+- **Me → Printer settings**: pick a paired printer, paper size, auto-print, test page.
+- The receipt prints automatically after **Collect payment** (if auto-print is on),
+  and can be printed again from the receipt screen. Copies after the first are
+  marked `*** REPRINT ***`.
+- Pair the printer in Android Bluetooth settings first (PIN usually `0000` or `1234`).
+
+How it works: `src/lib/escpos.ts` builds the ESC/POS bytes and
+`src/lib/receipt-printout.ts` lays out the receipt; the local native module
+`modules/escpos-printer` (Kotlin) sends the bytes over an RFCOMM/SPP socket.
+
+**Printing does not work in Expo Go** (it has no Bluetooth module). Use a
+development build instead:
+
+```bash
+npx eas-cli@latest login
+npx eas-cli@latest build --platform android --profile development
+```
+
+Install the APK from the link EAS gives you, then run `npx expo start` and open
+the project from the installed **NDTECH Collector** app instead of Expo Go.
+Rebuild only when native code (`modules/`) or native dependencies change.
+
 ## Building an APK
 
 Use EAS Build (no local Android Studio or Java needed):
 
 ```bash
-npx eas-cli@latest build:configure   # first time only: creates eas.json
 npx eas-cli@latest build --platform android --profile preview
 ```
 

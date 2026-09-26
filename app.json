@@ -42,6 +42,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "27acbacf-851d-4977-b4c7-ea81b95185d9"
+      }
+    },
+    "owner": "apolinario1987"
   }
 }

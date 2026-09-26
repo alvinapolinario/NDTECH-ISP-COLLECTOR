@@ -49,6 +49,7 @@ function RootNavigator() {
         <Stack.Screen name="visit/[invoiceId]" options={{ title: 'Log visit' }} />
         <Stack.Screen name="receipt/[paymentId]" options={{ title: 'Receipt' }} />
         <Stack.Screen name="remittances" options={{ title: 'Remittances' }} />
+        <Stack.Screen name="printer" options={{ title: 'Printer' }} />
       </Stack.Protected>
     </Stack>
   );
