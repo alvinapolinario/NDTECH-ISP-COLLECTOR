@@ -1,7 +1,9 @@
 export const colors = {
-  primary: '#1D4ED8',
-  primaryPressed: '#1E40AF',
-  primarySoft: '#DBEAFE',
+  // NDTECH brand purple (from the company logo).
+  primary: '#5B2BB5',
+  primaryPressed: '#4A2296',
+  primaryDark: '#3B1A78',
+  primarySoft: '#EDE7FA',
   background: '#F3F4F6',
   surface: '#FFFFFF',
   border: '#E5E7EB',

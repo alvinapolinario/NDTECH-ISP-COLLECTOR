@@ -1,9 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query';
 import Constants from 'expo-constants';
-import * as SecureStore from 'expo-secure-store';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { apiRequest, configureApiSession } from './api';
 import { getDeviceId } from './device';
+import { deleteStoredItem, getStoredItem, setStoredItem } from './storage';
 import type { LoginResponse, SessionUser } from './types';
 
 const SESSION_KEY = 'ndtech.session';
@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const clearSession = useCallback(async () => {
     configureApiSession({ token: null });
-    await SecureStore.deleteItemAsync(SESSION_KEY);
+    await deleteStoredItem(SESSION_KEY);
     queryClient.clear();
     setUser(null);
     setStatus('signedOut');
@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     (async () => {
       configureApiSession({ deviceId: await getDeviceId() });
 
-      const raw = await SecureStore.getItemAsync(SESSION_KEY);
+      const raw = await getStoredItem(SESSION_KEY);
       const saved = raw ? (JSON.parse(raw) as StoredSession) : null;
 
       if (!saved || new Date(saved.expiresAt) <= new Date()) {
@@ -68,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     const saved: StoredSession = { token: result.token, expiresAt: result.expiresAt, user: result.user };
-    await SecureStore.setItemAsync(SESSION_KEY, JSON.stringify(saved));
+    await setStoredItem(SESSION_KEY, JSON.stringify(saved));
     configureApiSession({ token: result.token });
     setUser(result.user);
     setStatus('signedIn');

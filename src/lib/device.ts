@@ -1,15 +1,15 @@
 import * as Crypto from 'expo-crypto';
-import * as SecureStore from 'expo-secure-store';
+import { getStoredItem, setStoredItem } from './storage';
 
 const DEVICE_ID_KEY = 'ndtech.deviceId';
 
 /** Stable per-install ID sent as X-Device-Id so the office can trace each write to a phone. */
 export async function getDeviceId() {
-  const existing = await SecureStore.getItemAsync(DEVICE_ID_KEY);
+  const existing = await getStoredItem(DEVICE_ID_KEY);
   if (existing) return existing;
 
   const created = Crypto.randomUUID();
-  await SecureStore.setItemAsync(DEVICE_ID_KEY, created);
+  await setStoredItem(DEVICE_ID_KEY, created);
   return created;
 }
 

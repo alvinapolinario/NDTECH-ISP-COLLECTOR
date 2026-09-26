@@ -42,3 +42,6 @@ yarn-error.*
 
 # local env (copy from .env.example)
 .env
+
+# local credentials, never commit
+.secrets/
