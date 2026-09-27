@@ -98,10 +98,17 @@ class EscposPrinterModule : Module() {
     }
 
     val device = bluetooth.getRemoteDevice(address)
-    // Discovery slows down and destabilises RFCOMM connections.
-    bluetooth.cancelDiscovery()
+    stopDiscoveryIfAllowed(bluetooth)
 
-    val socket = connect(device)
+    val socket = try {
+      connect(device)
+    } catch (error: SecurityException) {
+      throw CodedException(
+        "ERR_BT_PERMISSION",
+        "Android blocked the printer connection. Allow Nearby devices for NDTECH Collector in app settings.",
+        error,
+      )
+    }
     try {
       val output = socket.outputStream
       var offset = 0
@@ -118,6 +125,22 @@ class EscposPrinterModule : Module() {
       throw CodedException("ERR_PRINT_FAILED", "Lost connection to the printer while printing. Try again.", error)
     } finally {
       runCatching { socket.close() }
+    }
+  }
+
+  /**
+   * An active device search slows down and destabilises RFCOMM connections,
+   * so stop it when possible. On Android 12+ that needs BLUETOOTH_SCAN, which
+   * this app doesn't request (it only uses already-paired printers), so it's
+   * skipped there unless granted. Never let this block printing.
+   */
+  @SuppressLint("MissingPermission")
+  private fun stopDiscoveryIfAllowed(bluetooth: BluetoothAdapter) {
+    val canScan = Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+      context.checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
+    if (!canScan) return
+    runCatching {
+      if (bluetooth.isDiscovering) bluetooth.cancelDiscovery()
     }
   }
 

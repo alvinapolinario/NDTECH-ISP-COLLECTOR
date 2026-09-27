@@ -85,7 +85,21 @@ async function send(settings: PrinterSettings, bytes: Uint8Array) {
   if (!(await ensureBluetoothPermission())) {
     throw new PrinterError('Bluetooth permission was denied. Allow "Nearby devices" in the app settings.');
   }
-  await printer.printAsync(settings.printer.address, toBase64(bytes));
+  try {
+    await printer.printAsync(settings.printer.address, toBase64(bytes));
+  } catch (error) {
+    throw new PrinterError(nativeErrorMessage(error));
+  }
+}
+
+/**
+ * Native rejections read "Call to function 'X' has been rejected.\n→ Caused by: <reason>".
+ * Show collectors just the reason.
+ */
+function nativeErrorMessage(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  const reason = message.split('Caused by:')[1]?.split('\n')[0]?.trim();
+  return reason || 'Printing failed. Check that the printer is on and nearby, then try again.';
 }
 
 export function printPaymentReceipt(settings: PrinterSettings, payment: Payment, options: { reprint: boolean }) {
